@@ -1,0 +1,118 @@
+import json
+import os
+
+
+def add_task(tasks, task_description):
+    """Adds a new task to the list."""
+    if not task_description:
+        print("Task description cannot be empty.")
+        return
+    tasks.append({"task": task_description, "completed": False})
+
+
+def view_tasks(tasks):
+    """Displays the tasks with their status."""
+    if not tasks:
+        print("No tasks found.")
+        return
+    for index, task in enumerate(tasks):
+        status = "[X]" if task["completed"] else "[ ]"
+        print(f"{index + 1}. {status} {task['task']}")
+
+
+def mark_completed(tasks, task_index):
+    """Marks a task as completed."""
+    if 1 <= task_index <= len(tasks):
+        tasks[task_index - 1]["completed"] = True
+    else:
+        print("Invalid task index.")
+
+
+def delete_task(tasks, task_index):
+    """Deletes a task from the list."""
+    if 1 <= task_index <= len(tasks):
+        del tasks[task_index - 1]
+    else:
+        print("Invalid task index.")
+
+
+def save_tasks(tasks, filename="tasks.json"):
+    """Saves tasks to a file."""
+    try:
+        with open(filename, "w") as f:
+            json.dump(tasks, f, indent=4)
+        print(f"Tasks saved to {filename}")
+    except IOError:
+        print(f"Could not save tasks to {filename}")
+
+
+def load_tasks(filename="tasks.json"):
+    """Loads tasks from a file."""
+    try:
+        if os.path.exists(filename):
+            with open(filename, "r") as f:
+                return json.load(f)
+        else:
+            return []
+    except (FileNotFoundError, json.JSONDecodeError, IOError):
+        print(f"Could not load tasks from {filename}. Starting with an empty list.")
+        return []
+
+
+def get_user_input(prompt):
+    """Gets user input."""
+    return input(prompt)
+
+
+def get_integer_input(prompt):
+    """Gets integer input."""
+    while True:
+        user_input = get_user_input(prompt)
+        if user_input.isdigit():
+            return int(user_input)
+        else:
+            print("Please enter a valid integer.")
+
+
+def main():
+    """Main function to run the application."""
+    tasks = load_tasks()
+
+
+    while True:
+        print("\nTo-Do List Application")
+        print("1. Add Task")
+        print("2. View Tasks")
+        print("3. Mark Task as Completed")
+        print("4. Delete Task")
+        print("5. Save and Exit")
+        print("6. Exit without saving")
+
+
+        choice = get_integer_input("Enter your choice: ")
+
+
+        if choice == 1:
+            task_description = get_user_input("Enter task description: ")
+            add_task(tasks, task_description)
+        elif choice == 2:
+            view_tasks(tasks)
+        elif choice == 3:
+            view_tasks(tasks)
+            task_index = get_integer_input("Enter task index to mark as completed: ")
+            mark_completed(tasks, task_index)
+        elif choice == 4:
+            view_tasks(tasks)
+            task_index = get_integer_input("Enter task index to delete: ")
+            delete_task(tasks, task_index)
+        elif choice == 5:
+            save_tasks(tasks)
+            break
+        elif choice == 6:
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+if __name__ == "__main__":
+    main()
